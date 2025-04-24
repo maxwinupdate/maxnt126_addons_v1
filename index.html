@@ -1,0 +1,67 @@
+<!-- Word редактор -->
+<div class="word-editor-widget" style="margin-top: 30px; padding: 15px; border: 2px solid #666; border-radius: 10px; background-color: #f9f9f9;">
+    <h2 style="font-size: 1.3em; font-weight: bold; color: #333;">📝 Редактор документів</h2>
+    <div style="margin-bottom: 10px;">
+        <button onclick="document.execCommand('bold')">Жирний</button>
+        <button onclick="document.execCommand('italic')">Курсив</button>
+        <button onclick="document.execCommand('underline')">Підкреслений</button>
+        <button onclick="changeColor()">Колір тексту</button>
+        <button onclick="document.execCommand('removeFormat')">Очистити формат</button>
+        <button onclick="cropText()">Обрізати</button>
+        <input type="color" id="textColor" style="display: none;">
+    </div>
+    <div id="wordContent" contenteditable="true" style="border: 1px solid #ccc; padding: 10px; min-height: 200px; background: white;"></div>
+    <div style="margin-top: 10px;">
+        <button onclick="saveAsDocx()">💾 Зберегти DOCX</button>
+        <button onclick="saveAsPDF()">📄 Зберегти PDF</button>
+    </div>
+</div>
+
+<!-- Віджет DeepStateMap -->
+<div class="deepstate-map-widget" style="margin-top: 30px; padding: 15px; border: 2px solid #006400; border-radius: 10px; background-color: #f0fff0;">
+    <h2 style="font-size: 1.3em; font-weight: bold; color: darkgreen;">🗺️ Карта бойових дій (DeepState)</h2>
+    <iframe src="https://deepstatemap.live/" width="100%" height="500" style="border: none; border-radius: 5px;"></iframe>
+    <p style="font-size: 0.9em; text-align: center;">
+        Дані з <a href="https://deepstatemap.live/" target="_blank" rel="noopener noreferrer">deepstatemap.live</a>
+    </p>
+</div>
+
+<script>
+function changeColor() {
+    const colorPicker = document.getElementById("textColor");
+    colorPicker.click();
+    colorPicker.oninput = () => {
+        document.execCommand("foreColor", false, colorPicker.value);
+    };
+}
+
+function cropText() {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    const text = range.toString();
+    if (text.length > 5) {
+        const cropped = text.slice(0, 5) + "...";
+        document.execCommand("insertText", false, cropped);
+    }
+}
+
+function saveAsDocx() {
+    const content = document.getElementById("wordContent").innerHTML;
+    const blob = new Blob([content], { type: 'application/msword' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "document.doc";
+    link.click();
+}
+
+function saveAsPDF() {
+    const content = document.getElementById("wordContent").innerHTML;
+    const win = window.open('', '', 'height=700,width=700');
+    win.document.write('<html><head><title>PDF</title></head><body>');
+    win.document.write(content);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
+}
+</script>
